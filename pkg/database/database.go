@@ -7,6 +7,7 @@ import (
 
 var DBConn *gorm.DB
 
+// function to connect with database
 func ConnectDatabase() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open("leads.db"), &gorm.Config{})
 	if err != nil {
