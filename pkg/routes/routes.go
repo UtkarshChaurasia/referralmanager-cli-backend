@@ -3,7 +3,8 @@ package routes
 import (
 	"log"
 	"net/http"
-	"referralmanager-cli-backend/pkg/repository"
+	"referralmanager-cli-backend/pkg/database"
+	"referralmanager-cli-backend/pkg/handler"
 
 	"github.com/gorilla/mux"
 )
@@ -11,40 +12,22 @@ import (
 // func to initialize router
 func InitializeRouter() {
 
+	Connection, err := database.ConnectDatabase()
+	if err != nil {
+		panic("Database error")
+	}
+
+	lHandler := handler.NewLeadHandler(Connection)
+
 	r := mux.NewRouter()
 
-	r.HandleFunc("/leads", GetAllLeads).Methods("GET")
-	r.HandleFunc("/leads/{company}", GetCompanyLeads).Methods("GET")
-	r.HandleFunc("/addlead", AddLead).Methods("POST")
-	r.HandleFunc("/updatelead", UpdateLead).Methods("PUT")
-	r.HandleFunc("/deletelead", DeleteLead).Methods("DELETE")
+	r.HandleFunc("/leads", lHandler.GetAllLeads).Methods("GET")
+	r.HandleFunc("/leads/{company}", lHandler.GetCompanyLeads).Methods("GET")
+	r.HandleFunc("/addlead", lHandler.AddLead).Methods("POST")
+	r.HandleFunc("/updatelead", lHandler.UpdateLead).Methods("PUT")
+	r.HandleFunc("/deletelead", lHandler.UpdateLead).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":3000", r))
 }
 
-var repo repository.Leadrepository = repository.Newrepository()
-
-// ROUTE 1: Get all the leads using: GET "/leads"
-func GetAllLeads(res http.ResponseWriter, req *http.Request) {
-
-}
-
-// ROUTE 2: Get all the leads of particular company using: GET "/leads/{company}"
-func GetCompanyLeads(res http.ResponseWriter, req *http.Request) {
-
-}
-
-// ROUTE 3: Add a new lead using: POST "/addlead"
-func AddLead(res http.ResponseWriter, req *http.Request) {
-
-}
-
-// ROUTE 4: Update an existing lead using: PUT "/updatelead"
-func UpdateLead(res http.ResponseWriter, req *http.Request) {
-
-}
-
-// ROUTE 5: Delete an existing lead using: DELETE "/updatelead"
-func DeleteLead(res http.ResponseWriter, req *http.Request) {
-
-}
+//var repo repository.Leadrepository = repository.Newrepository()
