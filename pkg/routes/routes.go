@@ -24,8 +24,8 @@ func InitializeRouter() {
 	r.HandleFunc("/leads", lHandler.GetAllLeads).Methods("GET")
 	r.HandleFunc("/leads/{company}", lHandler.GetCompanyLeads).Methods("GET")
 	r.HandleFunc("/addlead", lHandler.AddLead).Methods("POST")
-	r.HandleFunc("/updatelead", lHandler.UpdateLead).Methods("PUT")
-	r.HandleFunc("/deletelead", lHandler.UpdateLead).Methods("DELETE")
+	r.HandleFunc("/updatelead/{id}", lHandler.UpdateLead).Methods("PUT")
+	r.HandleFunc("/deletelead/{id}", lHandler.UpdateLead).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":3000", r))
 }
