@@ -37,7 +37,7 @@ func (m *sqliteLeadRepo) FetchAll() (*gorm.DB, []models.Lead, error) {
 func (m *sqliteLeadRepo) FindByCompany(Company string) (*gorm.DB, []models.Lead, error) {
 	var leads []models.Lead
 
-	result := m.Conn.Where("Company <> ?", Company).Find(&leads)
+	result := m.Conn.Where("Company = ?", Company).Find(&leads)
 	//sqlDB, _ := m.Conn.DB()
 	//sqlDB.Close()
 	return result, leads, nil
