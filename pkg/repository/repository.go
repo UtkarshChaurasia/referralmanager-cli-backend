@@ -13,5 +13,5 @@ type LeadRepository interface {
 	FindByCompany(Company string) (*gorm.DB, []models.Lead, error)
 	CreateLead(lead *models.Lead) (*gorm.DB, error)
 	UpdateLead(lead *models.Lead) (*models.Lead, error)
-	DeleteLead(Email string) (string, error)
+	DeleteLead(ID string) (string, error)
 }

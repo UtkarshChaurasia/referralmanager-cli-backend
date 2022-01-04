@@ -1,6 +1,7 @@
 package lead_sqlite
 
 import (
+	"fmt"
 	"referralmanager-cli-backend/pkg/models"
 	"referralmanager-cli-backend/pkg/repository"
 
@@ -65,6 +66,16 @@ func (m *sqliteLeadRepo) UpdateLead(lead *models.Lead) (*models.Lead, error) {
 }
 
 // function to delete an existing lead
-func (m *sqliteLeadRepo) DeleteLead(Email string) (string, error) {
-	return "", nil
+func (m *sqliteLeadRepo) DeleteLead(ID string) (string, error) {
+	var lead models.Lead
+	var message string
+	fmt.Println(ID)
+	result := m.Conn.Where("ID = ?", ID).Delete(&lead)
+	err := result.Error
+	if err != nil {
+		fmt.Println("Delete lead error")
+	} else {
+		fmt.Println("Deleted Successfully")
+	}
+	return message, err
 }

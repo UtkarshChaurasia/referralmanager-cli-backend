@@ -31,9 +31,7 @@ func (l *Lead) GetAllLeads(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println("Fetch all leads error")
 	} else {
-		for _, u := range leads {
-			fmt.Println("Name: ", u.Name, "Email: ", u.Email, "Message: ", u.Message, "Company: ", u.Company)
-		}
+		fmt.Println("Fetched Successfully")
 	}
 	//fmt.Println("{}", leads)
 	json.NewEncoder(res).Encode(leads)
@@ -53,9 +51,7 @@ func (l *Lead) GetCompanyLeads(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println("Fetch all leads error")
 	} else {
-		for _, u := range leads {
-			fmt.Println("Name: ", u.Name, "Email: ", u.Email, "Message: ", u.Message, "Company: ", u.Company)
-		}
+		fmt.Println("Fetched Successfully")
 	}
 
 	fmt.Println("Company Route")
@@ -69,13 +65,13 @@ func (l *Lead) AddLead(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	var newLead *models.Lead
 	json.NewDecoder(req.Body).Decode(&newLead)
-	createdLead, err := l.repo.CreateLead(newLead)
+	_, err := l.repo.CreateLead(newLead)
 	if err != nil {
 		fmt.Println("Fetch all leads error")
 	} else {
 		fmt.Println("Created Lead")
 	}
-	json.NewEncoder(res).Encode(createdLead)
+	json.NewEncoder(res).Encode(newLead)
 
 }
 
@@ -86,5 +82,17 @@ func (l *Lead) UpdateLead(res http.ResponseWriter, req *http.Request) {
 
 // ROUTE 5: Delete an existing lead using: DELETE "/updatelead"
 func (l *Lead) DeleteLead(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(req)
+
+	id := params["id"]
+	fmt.Println("id")
+	message, err := l.repo.DeleteLead(id)
+	if err != nil {
+		fmt.Println("Delete lead error")
+	} else {
+		fmt.Println("Deleted Lead")
+	}
+	json.NewEncoder(res).Encode(message)
 
 }
