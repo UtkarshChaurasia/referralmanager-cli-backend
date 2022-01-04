@@ -26,15 +26,13 @@ type Lead struct {
 func (l *Lead) GetAllLeads(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set("Content-Type", "application/json")
-	//var allleads []models.Lead
 	_, leads, err := l.repo.FetchAll()
 	if err != nil {
-		fmt.Println("Fetch all leads error")
+		errmsg := err.Error()
+		json.NewEncoder(res).Encode(errmsg)
 	} else {
-		fmt.Println("Fetched Successfully")
+		json.NewEncoder(res).Encode(leads)
 	}
-	//fmt.Println("{}", leads)
-	json.NewEncoder(res).Encode(leads)
 
 }
 
@@ -45,11 +43,15 @@ func (l *Lead) GetCompanyLeads(res http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
 
 	Company := params["company"]
-	fmt.Println(Company)
-	_, leads, err := l.repo.FindByCompany(Company)
+	result, leads, err := l.repo.FindByCompany(Company)
+	rows := result.RowsAffected
 
+	if rows == 0 {
+		message := "No Leads of " + Company + " found"
+		json.NewEncoder(res).Encode(message)
+	}
 	if err != nil {
-		fmt.Println("Fetch all leads error")
+		fmt.Println("Sorry leads for ", Company, " could not be fetched")
 	} else {
 		fmt.Println("Fetched Successfully")
 	}
@@ -65,18 +67,49 @@ func (l *Lead) AddLead(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	var newLead *models.Lead
 	json.NewDecoder(req.Body).Decode(&newLead)
-	_, err := l.repo.CreateLead(newLead)
+	result, err := l.repo.CreateLead(newLead)
+	rows := result.RowsAffected
+	errmsg := err.Error()
+	if rows == 0 {
+		if errmsg == "UNIQUE constraint failed: leads.email" {
+			message := "Another lead with email id: " + newLead.Email + " exists"
+			json.NewEncoder(res).Encode(message)
+		} else {
+			message := "Some error occurred"
+			json.NewEncoder(res).Encode(message)
+		}
+	} else {
+		json.NewEncoder(res).Encode(newLead)
+	}
 	if err != nil {
 		fmt.Println("Fetch all leads error")
 	} else {
 		fmt.Println("Created Lead")
 	}
-	json.NewEncoder(res).Encode(newLead)
 
 }
 
 // ROUTE 4: Update an existing lead using: PUT "/updatelead"
 func (l *Lead) UpdateLead(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+	var newLead *models.Lead
+	json.NewDecoder(req.Body).Decode(&newLead)
+	params := mux.Vars(req)
+
+	id := params["id"]
+	result, updatedLead, err := l.repo.UpdateLead(newLead, id)
+	rows := result.RowsAffected
+	if rows == 0 {
+		message := "No Leads found with Id " + id + " found"
+		json.NewEncoder(res).Encode(message)
+	} else {
+		json.NewEncoder(res).Encode(updatedLead)
+	}
+	if err != nil {
+		fmt.Println("Update leads error")
+	} else {
+		fmt.Println("Updated Lead")
+	}
 
 }
 
@@ -87,12 +120,20 @@ func (l *Lead) DeleteLead(res http.ResponseWriter, req *http.Request) {
 
 	id := params["id"]
 	fmt.Println("id")
-	message, err := l.repo.DeleteLead(id)
+	result, err := l.repo.DeleteLead(id)
+	rows := result.RowsAffected
+
+	if rows == 0 {
+		message := "No Leads found with Id " + id
+		json.NewEncoder(res).Encode(message)
+	} else {
+		message := "Lead with Id " + id + " deleted successfully"
+		json.NewEncoder(res).Encode(message)
+	}
 	if err != nil {
 		fmt.Println("Delete lead error")
 	} else {
 		fmt.Println("Deleted Lead")
 	}
-	json.NewEncoder(res).Encode(message)
 
 }
