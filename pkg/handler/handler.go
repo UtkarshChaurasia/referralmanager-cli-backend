@@ -1,10 +1,15 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"referralmanager-cli-backend/pkg/database"
+	"referralmanager-cli-backend/pkg/models"
 	"referralmanager-cli-backend/pkg/repository"
 	"referralmanager-cli-backend/pkg/repository/lead_sqlite"
+
+	"github.com/gorilla/mux"
 )
 
 func NewLeadHandler(db *database.DB) *Lead {
@@ -20,15 +25,57 @@ type Lead struct {
 // ROUTE 1: Get all the leads using: GET "/leads"
 func (l *Lead) GetAllLeads(res http.ResponseWriter, req *http.Request) {
 
+	res.Header().Set("Content-Type", "application/json")
+	//var allleads []models.Lead
+	_, leads, err := l.repo.FetchAll()
+	if err != nil {
+		fmt.Println("Fetch all leads error")
+	} else {
+		for _, u := range leads {
+			fmt.Println("Name: ", u.Name, "Email: ", u.Email, "Message: ", u.Message, "Company: ", u.Company)
+		}
+	}
+	//fmt.Println("{}", leads)
+	json.NewEncoder(res).Encode(leads)
+
 }
 
 // ROUTE 2: Get all the leads of particular company using: GET "/leads/{company}"
 func (l *Lead) GetCompanyLeads(res http.ResponseWriter, req *http.Request) {
 
+	res.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(req)
+
+	Company := params["company"]
+	fmt.Println(Company)
+	_, leads, err := l.repo.FindByCompany(Company)
+
+	if err != nil {
+		fmt.Println("Fetch all leads error")
+	} else {
+		for _, u := range leads {
+			fmt.Println("Name: ", u.Name, "Email: ", u.Email, "Message: ", u.Message, "Company: ", u.Company)
+		}
+	}
+
+	fmt.Println("Company Route")
+	json.NewEncoder(res).Encode(leads)
+
 }
 
 // ROUTE 3: Add a new lead using: POST "/addlead"
 func (l *Lead) AddLead(res http.ResponseWriter, req *http.Request) {
+
+	res.Header().Set("Content-Type", "application/json")
+	var newLead *models.Lead
+	json.NewDecoder(req.Body).Decode(&newLead)
+	createdLead, err := l.repo.CreateLead(newLead)
+	if err != nil {
+		fmt.Println("Fetch all leads error")
+	} else {
+		fmt.Println("Created Lead")
+	}
+	json.NewEncoder(res).Encode(createdLead)
 
 }
 

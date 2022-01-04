@@ -1,8 +1,18 @@
 package models
 
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
 type Lead struct {
-	Name    string
-	Email   string `gorm:"primaryKey"`
-	Message string
-	Company string
+	gorm.Model
+	Name      string
+	Email     string
+	Message   string `gorm:"primaryKey"`
+	Company   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
