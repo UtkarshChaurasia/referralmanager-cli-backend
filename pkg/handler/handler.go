@@ -69,15 +69,9 @@ func (l *Lead) AddLead(res http.ResponseWriter, req *http.Request) {
 	json.NewDecoder(req.Body).Decode(&newLead)
 	result, err := l.repo.CreateLead(newLead)
 	rows := result.RowsAffected
-	errmsg := err.Error()
 	if rows == 0 {
-		if errmsg == "UNIQUE constraint failed: leads.email" {
-			message := "Another lead with email id: " + newLead.Email + " exists"
-			json.NewEncoder(res).Encode(message)
-		} else {
-			message := "Some error occurred"
-			json.NewEncoder(res).Encode(message)
-		}
+		message := "Another lead with email id: " + newLead.Email + " exists"
+		json.NewEncoder(res).Encode(message)
 	} else {
 		json.NewEncoder(res).Encode(newLead)
 	}
