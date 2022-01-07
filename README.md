@@ -2,6 +2,7 @@
 
 - REST API for Referral Manager CLI Tool.
 - Project to learn Golang Backend.
+- Followed Repository Design Pattern.
 
 
 ---
